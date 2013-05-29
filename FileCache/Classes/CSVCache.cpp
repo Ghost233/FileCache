@@ -18,7 +18,7 @@ CSVCache::CSVCache(void)
 
 CSVCache::~CSVCache(void)
 {
-    m_pCSVCache->release();
+    CC_SAFE_RELEASE_NULL(m_pCSVCache);
 }
 
 CSVCache* CSVCache::sharedInstant()

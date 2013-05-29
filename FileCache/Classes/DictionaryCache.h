@@ -34,14 +34,10 @@ public:
     CCDictionary* getDictionary(const char *path);
     
     void removeAllCache();
-    void removeData(const char * filename);
+    void removeDictionary(const char * filename);
     
 private:
     CCDictionary* m_pDictionaryCache;
-    CCDictionary* parseCSV(CCString *data);
-    vector<string> split(const string& src, string delimit, string null_subst="");
-    CCArray* splitToCCArray(CCString *source, string key);
-    CCString* substr(CCString *source, int location, int length);
 };
 
 #endif /* defined(__FileCache__DictionaryCache__) */

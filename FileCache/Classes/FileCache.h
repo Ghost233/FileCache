@@ -34,10 +34,12 @@ public:
     void addFileAsyncCallBack(float dt);
     CCString* getFile(const char *path);
     
+    CCDictionary* parseDictionary(const char *data, unsigned int length);
+    
     static void* asyncLoadFile(void* data);
     
     void removeAllCache();
-    void removeData(const char * filename);
+    void removeCSV(const char * filename);
     
 private:
     CCDictionary* m_pDataCache;
