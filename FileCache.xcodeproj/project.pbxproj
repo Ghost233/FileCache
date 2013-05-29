@@ -267,6 +267,8 @@
 		E63288A2174A2A5A00A71EB9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288A1174A2A5A00A71EB9 /* AppDelegate.cpp */; };
 		E63288A5174A2A5A00A71EB9 /* HelloWorldScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288A4174A2A5A00A71EB9 /* HelloWorldScene.cpp */; };
 		E63288AD174A2A7A00A71EB9 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288AB174A2A7A00A71EB9 /* FileCache.cpp */; };
+		E6DAD46F174DCF0C00DE8C48 /* CSVCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DAD46D174DCF0C00DE8C48 /* CSVCache.cpp */; };
+		E6DED86D175315DD00B9EA71 /* DictionaryCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DED86B175315DD00B9EA71 /* DictionaryCache.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -835,6 +837,10 @@
 		E63288A4174A2A5A00A71EB9 /* HelloWorldScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = HelloWorldScene.cpp; path = Classes/HelloWorldScene.cpp; sourceTree = "<group>"; };
 		E63288AB174A2A7A00A71EB9 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = Classes/FileCache.cpp; sourceTree = "<group>"; };
 		E63288AC174A2A7A00A71EB9 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileCache.h; path = Classes/FileCache.h; sourceTree = "<group>"; };
+		E6DAD46D174DCF0C00DE8C48 /* CSVCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSVCache.cpp; path = Classes/CSVCache.cpp; sourceTree = "<group>"; };
+		E6DAD46E174DCF0C00DE8C48 /* CSVCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSVCache.h; path = Classes/CSVCache.h; sourceTree = "<group>"; };
+		E6DED86B175315DD00B9EA71 /* DictionaryCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DictionaryCache.cpp; path = Classes/DictionaryCache.cpp; sourceTree = "<group>"; };
+		E6DED86C175315DD00B9EA71 /* DictionaryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DictionaryCache.h; path = Classes/DictionaryCache.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1981,10 +1987,14 @@
 			children = (
 				E63288AB174A2A7A00A71EB9 /* FileCache.cpp */,
 				E63288AC174A2A7A00A71EB9 /* FileCache.h */,
+				E6DAD46D174DCF0C00DE8C48 /* CSVCache.cpp */,
+				E6DAD46E174DCF0C00DE8C48 /* CSVCache.h */,
 				E63288A0174A2A5A00A71EB9 /* AppDelegate.h */,
 				E63288A1174A2A5A00A71EB9 /* AppDelegate.cpp */,
 				E63288A3174A2A5A00A71EB9 /* HelloWorldScene.h */,
 				E63288A4174A2A5A00A71EB9 /* HelloWorldScene.cpp */,
+				E6DED86B175315DD00B9EA71 /* DictionaryCache.cpp */,
+				E6DED86C175315DD00B9EA71 /* DictionaryCache.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -2299,6 +2309,8 @@
 				E63288A2174A2A5A00A71EB9 /* AppDelegate.cpp in Sources */,
 				E63288A5174A2A5A00A71EB9 /* HelloWorldScene.cpp in Sources */,
 				E63288AD174A2A7A00A71EB9 /* FileCache.cpp in Sources */,
+				E6DAD46F174DCF0C00DE8C48 /* CSVCache.cpp in Sources */,
+				E6DED86D175315DD00B9EA71 /* DictionaryCache.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2436,6 +2448,7 @@
 				E63288AA174A2A5A00A71EB9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

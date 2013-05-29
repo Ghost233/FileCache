@@ -13,6 +13,7 @@ typedef struct _AsyncStruct
     string            filename;
     CCObject    *target;
     SEL_CallFuncO        selector;
+    CCCallFuncO        *call;
 } AsyncStruct;
 
 typedef struct _DataStruct
@@ -69,7 +70,42 @@ bool FileCache::init()
     return true;
 }
 
-void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector)
+CCString* FileCache::addFile(const char *path)
+{
+    string filename(path);
+    CCString *tempData = (CCString*) m_pDataCache->objectForKey(path);
+    if (tempData != NULL)
+    {
+        return tempData;
+    }
+    
+    unsigned long nSize = 0;
+    unsigned char *pBuffer = CCFileUtils::sharedFileUtils()->getFileData(path, "rb", &nSize);
+    
+    CCString *tempString = CCString::createWithData(pBuffer, nSize);
+    m_pDataCache->setObject(tempData, path);
+    
+    return tempString;
+}
+
+CCString* FileCache::getFileWithoutCache(const char *path)
+{
+    string filename(path);
+    CCString *tempData = (CCString*) m_pDataCache->objectForKey(path);
+    if (tempData != NULL)
+    {
+        return tempData;
+    }
+    
+    unsigned long nSize = 0;
+    unsigned char *pBuffer = CCFileUtils::sharedFileUtils()->getFileData(path, "rb", &nSize);
+    
+    CCString *tempString = CCString::createWithData(pBuffer, nSize);
+    
+    return tempString;
+}
+
+void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector, CCCallFuncO *call)
 {
     string filename(path);
     CCString *tempData = (CCString*) m_pDataCache->objectForKey(path);
@@ -77,7 +113,18 @@ void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO s
     {
         if (target && selector)
         {
-            (target->*selector)(tempData);
+            if (call)
+            {
+                CCDictionary *dic = CCDictionary::create();
+                dic->setObject(tempData, "data");
+                dic->setObject(CCString::create(path), "name");
+                call->setObject(dic);
+                (target->*selector)(call);
+            }
+            else
+            {
+                (target->*selector)(tempData);
+            }
         }
         
         return;
@@ -107,10 +154,16 @@ void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO s
         target->retain();
     }
     
+    if (call)
+    {
+        call->retain();
+    }
+    
     AsyncStruct *temp = new AsyncStruct();
     temp->filename = filename;
     temp->target = target;
     temp->selector = selector;
+    temp->call = call;
     
     pthread_mutex_lock(&s_asyncStructQueueMutex);
     s_pAsyncStructQueue->push(temp);
@@ -138,14 +191,23 @@ void FileCache::addFileAsyncCallBack(float dt)
         CCObject *target = pAsyncStruct->target;
         SEL_CallFuncO selector = pAsyncStruct->selector;
         const char* filename = pAsyncStruct->filename.c_str();
-        
-        int length = string->length();
+        CCCallFuncO *call = pAsyncStruct->call;
         
         CCString *tempString = CCString::create(*string);
         
         m_pDataCache->setObject(tempString, filename);
         
-        if (target && selector)
+        if (target && selector && call)
+        {
+            CCDictionary *dic = CCDictionary::create();
+            dic->setObject(tempString, "data");
+            dic->setObject(CCString::create(filename), "name");
+            call->setObject(dic);
+            (target->*selector)(call);
+            target->release();
+            call->release();
+        }
+        else if (target && selector)
         {
             (target->*selector)(tempString);
             target->release();

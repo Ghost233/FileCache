@@ -27,7 +27,10 @@ public:
     
     virtual bool init();
     
-    void addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector);
+    CCString* addFile(const char *path);
+    CCString* getFileWithoutCache(const char *path);
+
+    void addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector, CCCallFuncO *call = NULL);
     void addFileAsyncCallBack(float dt);
     CCString* getFile(const char *path);
     
