@@ -328,12 +328,81 @@ static pthread_t s_loadingThread;
 static pthread_mutex_t      s_asyncStructQueueMutex;
 static pthread_mutex_t      s_dataStructQueueMutex;
 
+static pthread_cond_t		s_SleepCondition;
+static pthread_mutex_t		s_SleepMutex;
+
 static queue<AsyncStruct*>* s_pAsyncStructQueue = NULL;
 static queue<DataStruct*>* s_pDataStructQueue = NULL;
 
 static unsigned long s_nAsyncRefCount = 0;
 
 static bool need_quit = false;
+
+static void* asyncLoadFile(void* data)
+{
+    AsyncStruct *pAsyncStruct = NULL;
+    while (true)
+    {
+        CCThread thread;
+        thread.createAutoreleasePool();
+        
+        std::queue<AsyncStruct*> *pQueue = s_pAsyncStructQueue;
+        pthread_mutex_lock(&s_asyncStructQueueMutex);// get async struct from queue
+        if (pQueue->empty())
+        {
+            pthread_mutex_unlock(&s_asyncStructQueueMutex);
+            if (need_quit) {
+                break;
+            }
+            else {
+                pthread_cond_wait(&s_SleepCondition, &s_SleepMutex);
+                continue;
+            }
+        }
+        else
+        {
+            pAsyncStruct = pQueue->front();
+            pQueue->pop();
+            pthread_mutex_unlock(&s_asyncStructQueueMutex);
+        }
+        
+        unsigned long nSize = 0;
+        const char* fullpath = pAsyncStruct->filename.c_str();
+        unsigned char *pBuffer = cocos2d::CCFileUtils::sharedFileUtils()->getFileData(fullpath, "rb", &nSize);
+        
+        if ((int)pBuffer[nSize - 1] == 10 || (int)pBuffer[nSize - 1] == 13) {
+            nSize --;
+        }
+        
+        if ((int)pBuffer[nSize - 1] == 10 || (int)pBuffer[nSize - 1] == 13) {
+            nSize --;
+        }
+        
+        pthread_mutex_lock(&s_dataStructQueueMutex);
+        DataStruct *tempDataStruct = new DataStruct();
+        tempDataStruct->asyncStruct = pAsyncStruct;
+        string *tempString = new string((char*)pBuffer, nSize);
+        nSize = tempString->length();
+        tempDataStruct->data = tempString;
+        s_pDataStructQueue->push(tempDataStruct);
+        pthread_mutex_unlock(&s_dataStructQueueMutex);
+    }
+    
+    if (s_pAsyncStructQueue != NULL)
+    {
+        delete s_pAsyncStructQueue;
+        s_pAsyncStructQueue = NULL;
+        delete s_pDataStructQueue;
+        s_pDataStructQueue = NULL;
+        
+        pthread_mutex_destroy(&s_dataStructQueueMutex);
+        pthread_mutex_destroy(&s_asyncStructQueueMutex);
+        pthread_mutex_destroy(&s_SleepMutex);
+        pthread_cond_destroy(&s_SleepCondition);
+    }
+    
+	return  NULL;
+}
 
 FileCache::FileCache(void)
 {
@@ -344,6 +413,7 @@ FileCache::~FileCache(void)
 {
     m_pDataCache->release();
     need_quit = true;
+    pthread_cond_signal(&s_SleepCondition);
 }
 
 FileCache* FileCache::sharedInstant()
@@ -378,13 +448,16 @@ CCString* FileCache::addFile(const char *path)
         return tempData;
     }
     
+    CCLOG("%s start", path);
     unsigned long nSize = 0;
     unsigned char *pBuffer = CCFileUtils::sharedFileUtils()->getFileData(path, "rb", &nSize);
+    CCLOG("%s done", path);
+
     
-    CCString *tempString = CCString::createWithData(pBuffer, nSize);
+    tempData = CCString::createWithData(pBuffer, nSize);
     m_pDataCache->setObject(tempData, path);
     
-    return tempString;
+    return tempData;
 }
 
 CCString* FileCache::getFileWithoutCache(const char *path)
@@ -399,6 +472,14 @@ CCString* FileCache::getFileWithoutCache(const char *path)
     unsigned long nSize = 0;
     unsigned char *pBuffer = CCFileUtils::sharedFileUtils()->getFileData(path, "rb", &nSize);
     
+    if ((int)pBuffer[nSize - 1] == 10 || (int)pBuffer[nSize - 1] == 13) {
+        nSize --;
+    }
+    
+    if ((int)pBuffer[nSize - 1] == 10 || (int)pBuffer[nSize - 1] == 13) {
+        nSize --;
+    }
+    
     CCString *tempString = CCString::createWithData(pBuffer, nSize);
     
     return tempString;
@@ -407,6 +488,7 @@ CCString* FileCache::getFileWithoutCache(const char *path)
 void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector, CCCallFuncO *call)
 {
     string filename(path);
+    CCLOG("%s", path);
     CCString *tempData = (CCString*) m_pDataCache->objectForKey(path);
     if (tempData != NULL)
     {
@@ -436,6 +518,8 @@ void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO s
         
         pthread_mutex_init(&s_asyncStructQueueMutex, NULL);
         pthread_mutex_init(&s_dataStructQueueMutex, NULL);
+        pthread_mutex_init(&s_SleepMutex, NULL);
+        pthread_cond_init(&s_SleepCondition, NULL);
         pthread_create(&s_loadingThread, NULL, asyncLoadFile, NULL);
         
         need_quit = false;
@@ -467,6 +551,8 @@ void FileCache::addFileAsync(const char *path, CCObject *target, SEL_CallFuncO s
     pthread_mutex_lock(&s_asyncStructQueueMutex);
     s_pAsyncStructQueue->push(temp);
     pthread_mutex_unlock(&s_asyncStructQueueMutex);
+    
+    pthread_cond_signal(&s_SleepCondition);
 }
 
 void FileCache::addFileAsyncCallBack(float dt)
@@ -527,60 +613,6 @@ CCString* FileCache::getFile(const char *path)
 {
     CCString *tempString = (CCString*) m_pDataCache->objectForKey(path);
     return tempString;
-}
-
-void* FileCache::asyncLoadFile(void* data)
-{
-    AsyncStruct *pAsyncStruct = NULL;
-    while (true)
-    {
-        CCThread thread;
-        thread.createAutoreleasePool();
-        
-        std::queue<AsyncStruct*> *pQueue = s_pAsyncStructQueue;
-        pthread_mutex_lock(&s_asyncStructQueueMutex);// get async struct from queue
-        if (pQueue->empty())
-        {
-            pthread_mutex_unlock(&s_asyncStructQueueMutex);
-            if (need_quit) {
-                break;
-            }
-            else {
-                continue;
-            }
-        }
-        else
-        {
-            pAsyncStruct = pQueue->front();
-            pQueue->pop();
-            pthread_mutex_unlock(&s_asyncStructQueueMutex);
-        }
-        
-        unsigned long nSize = 0;
-        const char* fullpath = pAsyncStruct->filename.c_str();
-        unsigned char *pBuffer = cocos2d::CCFileUtils::sharedFileUtils()->getFileData(fullpath, "rb", &nSize);
-        
-        pthread_mutex_lock(&s_dataStructQueueMutex);
-        DataStruct *tempDataStruct = new DataStruct();
-        tempDataStruct->asyncStruct = pAsyncStruct;
-        string *tempString = new string((char*)pBuffer, nSize);
-        nSize = tempString->length();
-        tempDataStruct->data = tempString;
-        s_pDataStructQueue->push(tempDataStruct);
-        pthread_mutex_unlock(&s_dataStructQueueMutex);
-    }
-    
-    if (s_pAsyncStructQueue != NULL)
-    {
-        delete s_pAsyncStructQueue;
-        s_pAsyncStructQueue = NULL;
-        delete s_pDataStructQueue;
-        s_pDataStructQueue = NULL;
-        
-        pthread_mutex_destroy(&s_asyncStructQueueMutex);
-    }
-    
-	return  NULL;
 }
 
 void FileCache::removeAllCache()

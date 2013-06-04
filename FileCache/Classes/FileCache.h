@@ -36,8 +36,6 @@ public:
     
     CCDictionary* parseDictionary(const char *data, unsigned int length);
     
-    static void* asyncLoadFile(void* data);
-    
     void removeAllCache();
     void removeCSV(const char * filename);
     
