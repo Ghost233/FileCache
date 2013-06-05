@@ -36,12 +36,16 @@ public:
     void removeAllCache();
     void removeData(const char * filename);
     
+    static CCDictionary* parseCSV(CCString *data);
+    static CCDictionary* parseCSVThreadSafeWithRetain(CCString *data);
+    static CCArray* splitToCCArray(CCString *source, string key);
+    static CCArray* splitToCCArrayThreadSafeWithRetain(CCString *source, string key);
+    static vector<string> split(const string& src, string delimit, string null_subst="");
+    static CCString* substr(CCString *source, int location, int length);
+    static CCString* substrThreadSafeWithRetain(CCString *source, int location, int length);
+    
 private:
     CCDictionary* m_pCSVCache;
-    CCDictionary* parseCSV(CCString *data);
-    vector<string> split(const string& src, string delimit, string null_subst="");
-    CCArray* splitToCCArray(CCString *source, string key);
-    CCString* substr(CCString *source, int location, int length);
 };
 
 #endif /* defined(__FileCache__CSVCache__) */

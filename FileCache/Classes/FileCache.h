@@ -16,6 +16,13 @@
 USING_NS_CC;
 using namespace std;
 
+enum DataType
+{
+    DataTypeString = 0,
+    DataTypeDictionray,
+    DataTypeCSV,
+};
+
 class FileCache : public CCObject
 {
 public:
@@ -30,11 +37,9 @@ public:
     CCString* addFile(const char *path);
     CCString* getFileWithoutCache(const char *path);
 
-    void addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector, CCCallFuncO *call = NULL);
+    void addFileAsync(const char *path, CCObject *target, SEL_CallFuncO selector, CCCallFuncO *call = NULL, DataType type = DataTypeString);
     void addFileAsyncCallBack(float dt);
     CCString* getFile(const char *path);
-    
-    CCDictionary* parseDictionary(const char *data, unsigned int length);
     
     void removeAllCache();
     void removeCSV(const char * filename);

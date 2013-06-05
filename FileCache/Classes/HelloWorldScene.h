@@ -19,6 +19,10 @@ public:
     CREATE_FUNC(HelloWorld);
     
     void abc(CCObject* string);
+    
+    cocos2d::CCDictionary *akjdsf;
+    
+    void update(float delta);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

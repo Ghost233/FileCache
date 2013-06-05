@@ -33,6 +33,9 @@ public:
     void addDictionaryAsyncCallBack(CCObject *object);
     CCDictionary* getDictionary(const char *path);
     
+    static CCDictionary* parseDictionary(CCString *data);
+    static CCDictionary* parseDictionaryThreadSafeWithRetain(CCString *data);
+    
     void removeAllCache();
     void removeDictionary(const char * filename);
     

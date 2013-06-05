@@ -267,6 +267,8 @@
 		E63288A2174A2A5A00A71EB9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288A1174A2A5A00A71EB9 /* AppDelegate.cpp */; };
 		E63288A5174A2A5A00A71EB9 /* HelloWorldScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288A4174A2A5A00A71EB9 /* HelloWorldScene.cpp */; };
 		E63288AD174A2A7A00A71EB9 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E63288AB174A2A7A00A71EB9 /* FileCache.cpp */; };
+		E659DB04175EF20700C94E3A /* big15.plist in Resources */ = {isa = PBXBuildFile; fileRef = E659DB03175EF20700C94E3A /* big15.plist */; };
+		E659DB06175F1B7A00C94E3A /* aaa.csv in Resources */ = {isa = PBXBuildFile; fileRef = E659DB05175F1B7A00C94E3A /* aaa.csv */; };
 		E6DAD46F174DCF0C00DE8C48 /* CSVCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DAD46D174DCF0C00DE8C48 /* CSVCache.cpp */; };
 		E6DED86D175315DD00B9EA71 /* DictionaryCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6DED86B175315DD00B9EA71 /* DictionaryCache.cpp */; };
 /* End PBXBuildFile section */
@@ -837,6 +839,8 @@
 		E63288A4174A2A5A00A71EB9 /* HelloWorldScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = HelloWorldScene.cpp; path = Classes/HelloWorldScene.cpp; sourceTree = "<group>"; };
 		E63288AB174A2A7A00A71EB9 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = Classes/FileCache.cpp; sourceTree = "<group>"; };
 		E63288AC174A2A7A00A71EB9 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileCache.h; path = Classes/FileCache.h; sourceTree = "<group>"; };
+		E659DB03175EF20700C94E3A /* big15.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = big15.plist; path = Resources/big15.plist; sourceTree = "<group>"; };
+		E659DB05175F1B7A00C94E3A /* aaa.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = aaa.csv; path = Resources/aaa.csv; sourceTree = "<group>"; };
 		E6DAD46D174DCF0C00DE8C48 /* CSVCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSVCache.cpp; path = Classes/CSVCache.cpp; sourceTree = "<group>"; };
 		E6DAD46E174DCF0C00DE8C48 /* CSVCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSVCache.h; path = Classes/CSVCache.h; sourceTree = "<group>"; };
 		E6DED86B175315DD00B9EA71 /* DictionaryCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DictionaryCache.cpp; path = Classes/DictionaryCache.cpp; sourceTree = "<group>"; };
@@ -911,6 +915,8 @@
 		E632853E174A2A5300A71EB9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E659DB05175F1B7A00C94E3A /* aaa.csv */,
+				E659DB03175EF20700C94E3A /* big15.plist */,
 				E632853F174A2A5300A71EB9 /* CloseNormal.png */,
 				E6328541174A2A5300A71EB9 /* CloseSelected.png */,
 				E6328543174A2A5300A71EB9 /* Default.png */,
@@ -2062,6 +2068,8 @@
 				E6328554174A2A5300A71EB9 /* iTunesArtwork in Resources */,
 				E63285F0174A2A5400A71EB9 /* ChangeLog in Resources */,
 				E632875A174A2A5800A71EB9 /* project.pbxproj in Resources */,
+				E659DB04175EF20700C94E3A /* big15.plist in Resources */,
+				E659DB06175F1B7A00C94E3A /* aaa.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2343,7 +2351,9 @@
 					"\"$(PROJECT_NAME)/libs/cocos2dx/platform/third_party/ios\"",
 					"\"$(PROJECT_NAME)/libs/cocos2dx/platform/ios\"",
 				);
+				INFOPLIST_OUTPUT_FORMAT = XML;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				PLIST_FILE_OUTPUT_FORMAT = XML;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2372,8 +2382,10 @@
 					"\"$(PROJECT_NAME)/libs/cocos2dx/platform/third_party/ios\"",
 					"\"$(PROJECT_NAME)/libs/cocos2dx/platform/ios\"",
 				);
+				INFOPLIST_OUTPUT_FORMAT = XML;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PLIST_FILE_OUTPUT_FORMAT = XML;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

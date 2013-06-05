@@ -61,7 +61,7 @@ CCDictionary* CSVCache::addCSVWithString(CCString *data, const char *name)
 
 void CSVCache::addCSVAsync(const char *path, CCObject *target, SEL_CallFuncO selector)
 {
-    FileCache::sharedInstant()->addFileAsync(path, this, callfuncO_selector(CSVCache::addCSVAsyncCallBack), CCCallFuncO::create(target, selector, NULL));
+    FileCache::sharedInstant()->addFileAsync(path, this, callfuncO_selector(CSVCache::addCSVAsyncCallBack), CCCallFuncO::create(target, selector, NULL), DataTypeCSV);
 }
 
 void CSVCache::addCSVAsyncCallBack(CCObject *object)
@@ -70,9 +70,8 @@ void CSVCache::addCSVAsyncCallBack(CCObject *object)
     CCDictionary *dictionary = (CCDictionary*) call->getObject();
     CCString *data = (CCString*) dictionary->objectForKey("data");
     CCString *name = (CCString*) dictionary->objectForKey("name");
-    CCDictionary *csv = this->parseCSV(data);
-    m_pCSVCache->setObject(csv, name->m_sString);
-    call->setObject(csv);
+    m_pCSVCache->setObject(data, name->m_sString);
+    call->setObject(data);
     call->execute();
 }
 
@@ -93,9 +92,18 @@ void CSVCache::removeData(const char * filename)
 
 CCDictionary* CSVCache::parseCSV(CCString* str)
 {
-    CCDictionary* data = CCDictionary::create();
+    CCDictionary *temp = CSVCache::parseCSVThreadSafeWithRetain(str);
+    temp->autorelease();
+    return temp;
+}
+
+CCDictionary* CSVCache::parseCSVThreadSafeWithRetain(CCString* str)
+{
+
+    CCDictionary* data = new CCDictionary();
     
-	CCArray* key = CCArray::create();
+	CCArray* key = new CCArray();
+    key->init();
 	const char* tempSave = str->getCString();
 	string tempStr;
 	int iD = 1;
@@ -108,7 +116,10 @@ CCDictionary* CSVCache::parseCSV(CCString* str)
  		{
 			if (!isFirstLine)
 			{
-				key = CSVCache::splitToCCArray(CCString::create(tempStr), ";");
+                CCString *tempString = new CCString(tempStr);
+				key = CSVCache::splitToCCArrayThreadSafeWithRetain(tempString, ";");
+                CC_SAFE_RELEASE_NULL(tempString);
+                
                 for (int i = 0 ; i < key->count() ; ++i)
                 {
                     CCString *tempString = (CCString*)key->objectAtIndex(i);
@@ -124,21 +135,29 @@ CCDictionary* CSVCache::parseCSV(CCString* str)
 				continue;
 			}
             
- 			CCArray* temp = CSVCache::splitToCCArray(CCString::create(tempStr), ";");
+            CCString *tempString = new CCString(tempStr);
+ 			CCArray* temp = CSVCache::splitToCCArrayThreadSafeWithRetain(tempString, ";");
+            CC_SAFE_RELEASE_NULL(tempString);
             CCString *tempString1 = (CCString*)temp->objectAtIndex(0);
             CCString *tempString2 = (CCString*)temp->objectAtIndex(1);
             tempStr.clear();
             if (tempString1->m_sString != "" || tempString2->m_sString != "")
             {
-                CCDictionary* tempDic = CCDictionary::create();
+                CCDictionary* tempDic = new CCDictionary();
                 
                 for (int j = 0;j < key->count(); ++ j)
                 {
                     tempDic->setObject(temp->objectAtIndex(j), ((CCString*)key->objectAtIndex(j))->getCString());
                 }
                 
-                data->setObject(tempDic, CCString::createWithFormat("%d", iD ++)->m_sString);
+                tempString = new CCString();
+                tempString->initWithFormat("%d", iD ++);
+                data->setObject(tempDic, tempString->m_sString);
+                CC_SAFE_RELEASE_NULL(tempString);
+                
+                CC_SAFE_RELEASE_NULL(tempDic);
             }
+            CC_SAFE_RELEASE_NULL(temp);
 			i++;
  		}
 		else
@@ -147,21 +166,28 @@ CCDictionary* CSVCache::parseCSV(CCString* str)
     
 	if (i == strlen(tempSave))
     {
-        CCArray* temp = CSVCache::splitToCCArray(CCString::create(tempStr), ";");
+        CCString *tempString = new CCString(tempStr);
+        CCArray* temp = CSVCache::splitToCCArrayThreadSafeWithRetain(tempString, ";");
+        CC_SAFE_RELEASE_NULL(tempString);
         tempStr.clear();
         CCString *tempString1 = (CCString*)temp->objectAtIndex(0);
         CCString *tempString2 = (CCString*)temp->objectAtIndex(1);
         if (tempString1->m_sString != "" || tempString2->m_sString != "")
         {
-            CCDictionary* tempDic = CCDictionary::create();
+            CCDictionary* tempDic = new CCDictionary();
             
             for (int j = 0;j < key->count(); ++ j)
             {
                 tempDic->setObject(temp->objectAtIndex(j), ((CCString*)key->objectAtIndex(j))->getCString());
             }
             
-            data->setObject(tempDic, CCString::createWithFormat("%d", iD ++)->m_sString);
+            tempString = new CCString();
+            tempString->initWithFormat("%d", iD ++);
+            data->setObject(tempDic, tempString->m_sString);
+            CC_SAFE_RELEASE_NULL(tempString);
+            CC_SAFE_RELEASE_NULL(tempDic);
         }
+        CC_SAFE_RELEASE_NULL(temp);
     }
 	return data;
 }
@@ -193,20 +219,38 @@ vector<string> CSVCache::split(const string& src, string delimit, string null_su
 
 CCArray* CSVCache::splitToCCArray(CCString *source, string key)
 {
+    CCArray *temp = CSVCache::splitToCCArrayThreadSafeWithRetain(source, key);
+    temp->autorelease();
+    return temp;
+}
+
+CCArray* CSVCache::splitToCCArrayThreadSafeWithRetain(CCString *source, string key)
+{
     string temp = source->m_sString;
     vector<string> array = split(temp, key);
     
-    CCArray *arrayTemp = CCArray::create();
+    CCArray *arrayTemp = new CCArray;
+    arrayTemp->init();
     
     for (int i = 0 ; i < array.size() ; ++i)
     {
-        arrayTemp->addObject(CCString::create(array[i]));
+        CCString *tempString = new CCString(array[i]);
+        arrayTemp->addObject(tempString);
+        CC_SAFE_RELEASE_NULL(tempString);
     }
     return arrayTemp;
 }
 
 CCString* CSVCache::substr(CCString *source, int location, int length)
 {
+    CCString *temp = CSVCache::substrThreadSafeWithRetain(source, location, length);
+    temp->autorelease();
+    return temp;
+}
+
+CCString* CSVCache::substrThreadSafeWithRetain(CCString *source, int location, int length)
+{
     string temp = source->m_sString.substr(location, length);
-    return CCString::create(temp);
+    CCString *tempString = new CCString(temp);
+    return tempString;
 }

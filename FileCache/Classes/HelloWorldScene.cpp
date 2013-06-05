@@ -2,6 +2,8 @@
 #include "SimpleAudioEngine.h"
 
 #include "FileCache.h"
+#include "DictionaryCache.h"
+#include "CSVCache.h"
 
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -25,24 +27,24 @@ CCScene* HelloWorld::scene()
 bool HelloWorld::init()
 {
     cocos2d::CCLayer::init();
-    FileCache::sharedInstant()->addFileAsync("HelloWorld.png", this, callfuncO_selector(HelloWorld::abc));
+    CSVCache::sharedInstant()->addCSVAsync("aaa.csv", this, callfuncO_selector(HelloWorld::abc));
+//    DictionaryCache::sharedInstant()->addDictionaryAsync("big15.plist", this, callfuncO_selector(HelloWorld::abc));
+//    FileCache::sharedInstant()->addFileAsync("HelloWorld.png", this, callfuncO_selector(HelloWorld::abc));
+    
+    this->scheduleUpdate();
     
     return true;
 }
 
 void HelloWorld::abc(CCObject* string)
 {
-    CCString *tempString = (CCString*) string;
-    
-    CCLOG("%d", tempString->length());
-    
-    CCTexture2D *texture = new CCTexture2D();
-    CCImage *image = new CCImage();
-    image->initWithImageData((void * ) tempString->getCString(), tempString->length());
-    texture->initWithImage(image);
-    CCSprite *sprite = CCSprite::createWithTexture(texture);
-    this->addChild(sprite);
-    sprite->setPosition(ccp(500, 500));
+    akjdsf = (CCDictionary*) string;
+    CCLOG("adf");
+}
+
+void HelloWorld::update(float delta)
+{
+    CCLOG("fghjk");
 }
 
 void HelloWorld::menuCloseCallback(CCObject* pSender)
